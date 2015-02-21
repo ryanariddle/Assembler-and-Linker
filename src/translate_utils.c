@@ -58,11 +58,21 @@ int translate_num(long int* output, const char* str, long int lower_bound,
     if (!str || !output) {
         return -1;
     }
+    /* YOUR CODE HERE */
     long int result;
-    char* pEnd;
+    char * pEnd;
     if (strlen(str) >= 1 && str[1] == 'x') {
       result = strtol(str, &pEnd, 16);
     } else if (strlen(str) >= 1 && str[1] != 'x') {
+      result = strtol(str, &pEnd, 10);
+    } else {
+      return -1;
+    }
+    long int result;
+    char * pEnd;
+    if (strlen(str) > 1 && str[1] == 'x') {
+      result = strtol(str, &pEnd, 16);
+    } else if (strlen(str) > 0) {
       result = strtol(str, &pEnd, 10);
     } else {
       return -1;
@@ -72,7 +82,8 @@ int translate_num(long int* output, const char* str, long int lower_bound,
       return 0;
     }
     return -1;
-}
+    }
+    
 
 /* Translates the register name to the corresponding register number. Please
    see the MIPS Green Sheet for information about register numbers.
