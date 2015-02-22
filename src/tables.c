@@ -73,7 +73,16 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     if ((*table).len == (*table).cap) {
     /* allocate more memory and copy in Symbols.
         if this fails call allocation_failed()
-        else update cap
+        else update cap. Maybe below, haven't compiled it
+        
+        int r = (2 * (*table).cap) * (sizeof(Symbol));
+        SymbolTable *newTable = realloc((*table).tbl, r);
+        if (newTable == NULL) {
+            allocation_failed();
+            return -1;
+        }
+        (*table).tbl = &newTable;
+        (*table).cap = r;
     */
     }
     int i;
