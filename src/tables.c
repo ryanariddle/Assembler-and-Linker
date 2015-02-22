@@ -36,8 +36,14 @@ void write_symbol(FILE* output, uint32_t addr, const char* name) {
    If memory allocation fails, you should call allocation_failed(). 
  */
 SymbolTable* create_table() {
-    /* YOUR CODE HERE */
-    return NULL;
+    SymbolTable *t = malloc(sizeof(SymbolTable));
+    if (t == NULL) {
+      allocation_failed();
+    }
+    (*t).tbl = malloc(sizeof(Symbol) * 10);
+    (*t).len = 0;
+    (*t).cap = 10;
+    return t;
 }
 
 /* Frees the given SymbolTable and all associated memory. */
@@ -60,17 +66,45 @@ void free_table(SymbolTable* table) {
    Otherwise, you should store the symbol name and address and return 0.
  */
 int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
-    /* YOUR CODE HERE */
-    return -1;
-}
+    if ((addr % 4) != 0) {
+        addr_alignment_incorrect();
+        return -1;
+    }
+    if ((*table).len == (*table).cap) {
+    /* allocate more memory and copy in Symbols.
+        if this fails call allocation_failed()
+        else update cap
+    */
+    }
+    int i;
+    Symbol* t = (*table).tbl;
+    for (i = 0; i < (*table).len; i++) {
+      if (strcmp(t[i].name, name) == 0) {
+          name_already_exists(name);
+          return -1;
+      }
+    }
+    Symbol *temp = malloc(sizeof(Symbol));
+    (*temp).name = name;
+    (*temp).addr = addr;
+    (*table).len += 1;
+    t[i] = *temp;
+    return 0;
+  }
 
 /* Returns the address (byte offset) of the given symbol. If a symbol with name
    NAME is not present in TABLE, return -1.
  */
 int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
-    /* YOUR CODE HERE */
+    int i;
+    Symbol* t = (*table).tbl;
+    for (i = 0; i < (*table).len; i++) {
+      if (strcmp(t[i].name, name) == 0) {
+          return t[i].addr;
+      }
+    }
     return -1;   
-}
+  }
 
 /* Writes the SymbolTable TABLE to OUTPUT. You should use write_symbol() to
    perform the write. Do not print any additional whitespace or characters.
