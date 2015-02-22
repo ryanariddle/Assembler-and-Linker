@@ -40,9 +40,9 @@ SymbolTable* create_table() {
     if (t == NULL) {
       allocation_failed();
     }
-    (*t).tbl = malloc(sizeof(Symbol) * 10);
+    (*t).tbl = malloc(sizeof(Symbol) * 2);
     (*t).len = 0;
-    (*t).cap = 10;
+    (*t).cap = 2;
     return t;
 }
 
@@ -71,19 +71,14 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
         return -1;
     }
     if ((*table).len == (*table).cap) {
-    /* allocate more memory and copy in Symbols.
-        if this fails call allocation_failed()
-        else update cap. Maybe below, haven't compiled it
-        
         int r = (2 * (*table).cap) * (sizeof(Symbol));
         SymbolTable *newTable = realloc((*table).tbl, r);
         if (newTable == NULL) {
             allocation_failed();
             return -1;
         }
-        (*table).tbl = &newTable;
+        (*table).tbl = newTable;
         (*table).cap = r;
-    */
     }
     int i;
     Symbol* t = (*table).tbl;
