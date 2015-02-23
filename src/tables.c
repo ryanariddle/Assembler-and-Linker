@@ -40,15 +40,22 @@ SymbolTable* create_table() {
     if (t == NULL) {
       allocation_failed();
     }
-    (*t).tbl = malloc(sizeof(Symbol) * 2);
+    (*t).tbl = malloc(sizeof(Symbol) * 10);
     (*t).len = 0;
-    (*t).cap = 2;
+    (*t).cap = 10;
     return t;
 }
 
 /* Frees the given SymbolTable and all associated memory. */
 void free_table(SymbolTable* table) {
-    /* YOUR CODE HERE */
+    int i;
+    //Symbol *t = table->tbl;
+    for (i = 0; i < (*table).len; i++) {
+        // free(&t[i].name);
+      // printf("%s\n", "HELLO");
+      // printf("%s\n", t[i].name);
+    }
+    // free(&table);
 }
 
 /* Adds a new symbol and its address to the SymbolTable pointed to by TABLE. 
@@ -72,25 +79,26 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     }
     if ((*table).len == (*table).cap) {
         int r = (2 * (*table).cap) * (sizeof(Symbol));
-        SymbolTable *newTable = realloc((*table).tbl, r);
-        if (newTable == NULL) {
+        table->tbl = realloc(table->tbl, r);
+        if (table->tbl == NULL) {
             allocation_failed();
             return -1;
         }
-        (*table).tbl = newTable;
-        (*table).cap = r;
+        table->cap = r;
     }
     int i;
-    Symbol* t = (*table).tbl;
-    for (i = 0; i < (*table).len; i++) {
+    Symbol* t = table->tbl;
+    for (i = 0; i < table->len; i++) {
       if (strcmp(t[i].name, name) == 0) {
           name_already_exists(name);
           return -1;
       }
     }
     Symbol *temp = malloc(sizeof(Symbol));
-    (*temp).name = name;
-    (*temp).addr = addr;
+    temp->name = malloc(sizeof(name) + 1);
+    strcpy(temp->name, name);
+    temp->addr = ((uint32_t) malloc(sizeof(addr)));
+    temp->addr = addr;
     (*table).len += 1;
     t[i] = *temp;
     return 0;
@@ -107,6 +115,10 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
           return t[i].addr;
       }
     }
+    // printf("%s%s :\n", "Failed", name);
+    // for (i = 0; i < (*table).len; i++) {
+    //   printf("%s\n", t[i].name);
+    // }
     return -1;   
   }
 
