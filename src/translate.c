@@ -185,11 +185,12 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args,
 }
 
 
-
+/* Helper function that checks if args are valid inputs. */
 int args_helper(char** args) {
   return 1;
 }
 
+/* Helper function that checks if num_args is a valid input. */
 int num_args_helper(size_t num_args) {
   if (num_args < 0) {
     return 0;
@@ -197,6 +198,7 @@ int num_args_helper(size_t num_args) {
   return 1;
 }
 
+/* Helper function that checks if addr is a valid input. */
 int addr_helper(uint32_t addr) {
   return 1;
 }

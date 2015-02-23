@@ -149,15 +149,98 @@ void test_table_2() {
 
 
 void test_translate() {
+    // DO WE NEED TO EMPTY CHAR BUFF EVERY TIME?!?!?!?!?
     int retval;
     char buff[35];
     char name[5];
-    char** args = (char *[]){"$s0", "$s1", "$s2"};
+    /* Test addiu */
+    char** addiu1 = (char *[]){"$a0", "$0", "0xABC"};
     size_t num_args = 3;
     uint32_t addr;
-    strcpy(name, "addu");
-    retval = translate_inst(buff, name, args, 3, NULL, NULL, NULL);
+    strcpy(name, "addiu");
+    retval = translate_inst(buff, name, addiu1, num_args, NULL, NULL, NULL);
     CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "24040abc"), 0);
+    char** addiu2 = (char *[]){"$a1", "$0", "10"};
+    retval = translate_inst(buff, name, addiu2, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "2405000a"), 0);
+    /* Test lui */
+    strcpy(name, "lui");
+    char** lui = (char *[]){"$at", "10"};
+    num_args = 2;
+    retval = translate_inst(buff, name, lui, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "3c01000a"), 0);
+    char** lui2 = (char *[]){"$t3", "532"};
+    retval = translate_inst(buff, name, lui2, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "3c0b0214"), 0);
+    /* Test ori */
+    strcpy(name, "ori");
+    char** ori = (char *[]){"$v0", "$at", "48350"};
+    num_args = 3;
+    retval = translate_inst(buff, name, ori, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "3422bcde"), 0);
+    char** ori2 = (char *[]){"$t3", "$t2", "$0x123"};
+    num_args = 3;
+    retval = translate_inst(buff, name, ori2, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "354b0123"), 0);
+    /* Test addu */
+    strcpy(name, "addu");
+    char** addu = (char *[]){"$v0", "$at", "48350"};
+    num_args = 3;
+    retval = translate_inst(buff, name, addu, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "00884821"), 0);
+    /* Test or */
+    strcpy(name, "or");
+    char** or = (char *[]){"$a0", "$a1", "$a3"};
+    num_args = 3;
+    retval = translate_inst(buff, name, or, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "00a72025"), 0);
+    /* Test slt */
+    strcpy(name, "slt");
+    char** slt = (char *[]){"$a2", "$t1", "$t0"};
+    num_args = 3;
+    retval = translate_inst(buff, name, slt, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "0128302a"), 0);
+    char** slt2 = (char *[]){"$at", "$t3", "$t2"};
+    retval = translate_inst(buff, name, slt2, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "016a082a"), 0);
+    /* Test sltu */
+    strcpy(name, "sltu");
+    char** sltu = (char *[]){"$a2", "$t1", "$t0"};
+    num_args = 3;
+    retval = translate_inst(buff, name, sltu, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "0128302b"), 0);
+    /* Test sll */
+    strcpy(name, "sll");
+    char** sll = (char *[]){"$t3", "$t2", "31"};
+    num_args = 3;
+    retval = translate_inst(buff, name, sll, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(buff, "000a5fc0"), 0);
+    /*
+    This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.
+    Still need to test:
+        - jr
+        - lb
+        - lbu
+        - lw
+        - sb
+        - sw
+        - beq
+        - bne
+        - j
+        - jal
+    */
 }
 
 /****************************************
