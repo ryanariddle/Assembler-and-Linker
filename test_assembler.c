@@ -142,12 +142,30 @@ void test_table_2() {
     free_table(tbl);
 }
 
+
+/****************************************
+ *  Test cases for translate.c 
+ ****************************************/
+
+
+void test_translate() {
+    int retval;
+    char buff[35];
+    char name[5];
+    char** args = (char *[]){"$s0", "$s1", "$s2"};
+    size_t num_args = 3;
+    uint32_t addr;
+    strcpy(name, "addu");
+    retval = translate_inst(buff, name, args, 3, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0);
+}
+
 /****************************************
  *  Add your test cases here
  ****************************************/
 
 int main(int argc, char** argv) {
-    CU_pSuite pSuite1 = NULL, pSuite2 = NULL;
+    CU_pSuite pSuite1 = NULL, pSuite2 = NULL, pSuite3 = NULL;
 
     if (CUE_SUCCESS != CU_initialize_registry()) {
         return CU_get_error();
@@ -174,6 +192,15 @@ int main(int argc, char** argv) {
         goto exit;
     }
     if (!CU_add_test(pSuite2, "test_table_2", test_table_2)) {
+        goto exit;
+    }
+
+    /* Suite 3 */
+    pSuite3 = CU_add_suite("Testing translate.c", NULL, NULL);
+    if (!pSuite3) {
+        goto exit;
+    }
+    if (!CU_add_test(pSuite3, "test_translate", test_translate)) {
         goto exit;
     }
 

@@ -114,16 +114,18 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
     if (num_args != 3 || !args[0] || !args[1] || !args[2] || funct > 33) {
       return -1;
     }
-
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
-
     uint32_t instruction = 0;
     rd = rd << 10;
     rs = rs << 21;
     rt = rt << 15;
+    printf("%d\n", rd);
+    printf("%d\n", rs);
+    printf("%d\n", rt);
     instruction = instruction | rd | rs | rt | funct;
+    printf("%zu\n", instruction);
 
     write_inst_hex(output, instruction);
 
