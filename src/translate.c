@@ -40,10 +40,16 @@
  */
 unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
     if (strcmp(name, "li") == 0) {
-        /* YOUR CODE HERE */
+        // if (sizeof (args) / sizeof (char) == num_args) {
+        //   /* DO STUFF*/
+        //   return 1;
+        // }
         return 0;
     } else if (strcmp(name, "blt") == 0) {
-        /* YOUR CODE HERE */
+        // if (sizeof (args) / sizeof (char) == num_args) {
+        //   /* DO STUFF*/
+        //   return 1;
+        // }
         return 0;
     } else {
         write_inst_string(output, name, args, num_args);
@@ -73,12 +79,27 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
  */
 int translate_inst(FILE* output, const char* name, char** args, size_t num_args, uint32_t addr,
     SymbolTable* symtbl, SymbolTable* reltbl) {
+    if (!(args_helper(args) && num_args_helper(num_args) && addr_helper(addr))) {
+      return -1;
+    }
     if (strcmp(name, "addu") == 0)       return write_rtype (0x21, output, args, num_args);
     else if (strcmp(name, "or") == 0)    return write_rtype (0x25, output, args, num_args);
     else if (strcmp(name, "slt") == 0)   return write_rtype (0x2a, output, args, num_args);
     else if (strcmp(name, "sltu") == 0)  return write_rtype (0x2b, output, args, num_args);
+    else if (strcmp(name, "jr") == 0)    return write_jr (0x08, output, args, num_args);
     else if (strcmp(name, "sll") == 0)   return write_shift (0x00, output, args, num_args);
-    /* YOUR CODE HERE */
+    else if (strcmp(name, "addiu") == 0) return write_addiu (0x9, output, args, num_args);
+    else if (strcmp(name, "ori") == 0)   return write_ori (0xd, output, args, num_args);
+    else if (strcmp(name, "lui") == 0)   return write_lui (0xf, output, args, num_args);
+    else if (strcmp(name, "lb") == 0)    return write_mem (0x20, output, args, num_args);
+    else if (strcmp(name, "lbu") == 0)   return write_mem (0x24, output, args, num_args);
+    else if (strcmp(name, "lw") == 0)    return write_mem (0x23, output, args, num_args);
+    else if (strcmp(name, "sb") == 0)    return write_mem (0x28, output, args, num_args);
+    else if (strcmp(name, "sw") == 0)    return write_mem (0x2b, output, args, num_args);
+    else if (strcmp(name, "beq") == 0)   return write_branch (0x4, output, args, num_args, addr, symtbl);
+    else if (strcmp(name, "bne") == 0)   return write_branch (0x5, output, args, num_args, addr, symtbl);
+    else if (strcmp(name, "j") == 0)     return write_jump (0x2, output, args, num_args, addr, reltbl);
+    else if (strcmp(name, "jal") == 0)   return write_jump (0x3, output, args, num_args, addr, reltbl);
     else                                 return -1;
 }
 
@@ -90,14 +111,22 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
    find bitwise operations to be the cleanest way to complete this function.
  */
 int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
-    // Perhaps perform some error checking?
+    if (num_args != 3 || !args[0] || !args[1] || !args[2] || funct > 33) {
+      return -1;
+    }
 
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
 
     uint32_t instruction = 0;
+    rd = rd << 10;
+    rs = rs << 21;
+    rt = rt << 15;
+    instruction = instruction | rd | rs | rt | funct;
+
     write_inst_hex(output, instruction);
+
     return 0;
 }
 
@@ -109,7 +138,9 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
    find bitwise operations to be the cleanest way to complete this function.
  */
 int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
-	// Perhaps perform some error checking?
+    if (num_args != 3 || !args[0] || !args[1] || !args[2]) {
+      return -1;
+    }
 
     long int shamt;
     int rd = translate_reg(args[0]);
@@ -119,4 +150,51 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
     uint32_t instruction = 0;
     write_inst_hex(output, instruction);
     return 0;
+}
+
+int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
+  return 0;
+}
+
+int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  return 0;
+}
+
+int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  return 0;
+}
+
+int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  return 0;
+}
+
+int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  return 0;
+}
+
+int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
+    uint32_t addr, SymbolTable* symtbl) {
+  return 0;
+}
+
+int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
+    uint32_t addr, SymbolTable* reltbl) {
+  return 0;
+}
+
+
+
+int args_helper(char** args) {
+  return 1;
+}
+
+int num_args_helper(size_t num_args) {
+  if (num_args < 0) {
+    return 0;
+  }
+  return 1;
+}
+
+int addr_helper(uint32_t addr) {
+  return 1;
 }
