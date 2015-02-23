@@ -48,14 +48,13 @@ SymbolTable* create_table() {
 
 /* Frees the given SymbolTable and all associated memory. */
 void free_table(SymbolTable* table) {
-    int i;
-    //Symbol *t = table->tbl;
-    for (i = 0; i < (*table).len; i++) {
-        // free(&t[i].name);
-      // printf("%s\n", "HELLO");
-      // printf("%s\n", t[i].name);
+    Symbol *t = table->tbl;
+    while (t < table->len) {
+      free(t->name);
+      free(t);
+      t++;
     }
-    // free(&table);
+    free(table);
 }
 
 /* Adds a new symbol and its address to the SymbolTable pointed to by TABLE. 
@@ -78,13 +77,13 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
         return -1;
     }
     if ((*table).len == (*table).cap) {
-        int r = (2 * (*table).cap) * (sizeof(Symbol));
+        int r = (4 * (*table).cap) * (sizeof(Symbol));
         table->tbl = realloc(table->tbl, r);
         if (table->tbl == NULL) {
             allocation_failed();
             return -1;
         }
-        table->cap = r;
+        table->cap = table->cap * 4;
     }
     int i;
     Symbol* t = table->tbl;
@@ -97,7 +96,6 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
     Symbol *temp = malloc(sizeof(Symbol));
     temp->name = malloc(sizeof(name) + 1);
     strcpy(temp->name, name);
-    temp->addr = ((uint32_t) malloc(sizeof(addr)));
     temp->addr = addr;
     (*table).len += 1;
     t[i] = *temp;
