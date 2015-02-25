@@ -297,6 +297,7 @@ void test_translate() {
     file_out = fopen("test_slt2.txt", "r");
     fgets(line, sizeof(line), file_out);
     strtok(line, "\n");
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "016a082a"), 0);
 
@@ -310,6 +311,7 @@ void test_translate() {
     file_out = fopen("test_sltu.txt", "r");
     fgets(line, sizeof(line), file_out);
     strtok(line, "\n");
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "0128302b"), 0);
 
@@ -323,13 +325,58 @@ void test_translate() {
     file_out = fopen("test_sll.txt", "r");
     fgets(line, sizeof(line), file_out);
     strtok(line, "\n");
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "000a5fc0"), 0);
+
+    /* Test jr */
+    file_out = fopen("test_jr.txt", "w");
+    strcpy(name, "jr");
+    char** jr = (char *[]){"$t1"};
+    num_args = 1;
+    retval = translate_inst(file_out, name, jr, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_jr.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
+    fclose(file_out);
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "01200008"), 0);
+
+    /* Test lb */
+    file_out = fopen("test_lb.txt", "w");
+    strcpy(name, "lb");
+    char** lb = (char *[]){"$t2", "0", "$t1"}
+    num_args = 3;
+    retval = translate_inst(file_out, name, lb, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_lb.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "812a0000"), 0);
+    /*
+
+    /* Test lbu */
+    file_out = fopen("test_lbu.txt", "w");
+    strcpy(name, "lbu");
+    char** lb = (char *[]){"$t3", "-3", "$s2"};
+    num_args = 3;
+    retval = translate_inst(file_out, name, lbu, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_lbu.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "924bfffd"), 0);
+
     /*
     This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.
     Still need to test:
-        - jr
-        - lb
+        - jr^
+        - lb^
         - lbu
         - lw
         - sb
