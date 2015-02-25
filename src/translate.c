@@ -213,8 +213,19 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 }
 
 int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
-  //NEED TO DO THIS
-  return 0;
+    long int imm;
+    int err = translate_num(&imm, args[1], -2147483648, 2147483647);
+    if (err == -1) {
+      return -1;
+    }
+    int rs = translate_reg(args[0]) << 21;
+    int rt = translate_reg(args[2]) << 16;
+    int o = opcode << 26;
+
+    uint32_t instruction = 0;
+    instruction = instruction ^ o ^ rs ^ rt ^ imm;
+    write_inst_hex(output, instruction);
+    return 0;
 }
 
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
@@ -224,9 +235,15 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args,
 }
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
+    //NEED TO FINISH THIS
     uint32_t addr, SymbolTable* reltbl) {
-  //NEED TO DO THIS
-  return 0;
+    int o = opcode << 26;
+    if (opcode == 0x2) {
+
+    } else {
+
+    }
+    return 0;
 }
 
 
