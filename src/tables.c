@@ -41,15 +41,8 @@ void write_symbol(FILE* output, uint32_t addr, const char* name) {
    to store this value for use during add_to_table().
  */
 SymbolTable* create_table(int mode) {
-    SymbolTable *t = malloc(sizeof(SymbolTable));
-    if (t == NULL) {
-      allocation_failed();
-    }
-    (*t).tbl = malloc(sizeof(Symbol) * 10);
-    (*t).len = 0;
-    (*t).cap = 10;
-    (*t).mode = mode;
-    return t;
+    /* YOUR CODE HERE */
+    return NULL;
 }
 
 /* Frees the given SymbolTable and all associated memory. */
