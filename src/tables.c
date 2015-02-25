@@ -35,14 +35,14 @@ void write_symbol(FILE* output, uint32_t addr, const char* name) {
    table. Multiple SymbolTables may exist at the same time. 
    If memory allocation fails, you should call allocation_failed(). 
  */
-SymbolTable* create_table() {
+SymbolTable* create_table(int mode) {
     SymbolTable *t = malloc(sizeof(SymbolTable));
     if (t == NULL) {
       allocation_failed();
     }
-    (*t).tbl = malloc(sizeof(Symbol) * 10);
+    (*t).tbl = malloc(sizeof(Symbol) * mode);
     (*t).len = 0;
-    (*t).cap = 10;
+    (*t).cap = mode;
     return t;
 }
 
