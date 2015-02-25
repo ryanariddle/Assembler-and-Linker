@@ -175,10 +175,10 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_addiu1.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     char blah[50];
     // printf("%s\n", blah);
-    printf("From file: %08x\n", line);
     CU_ASSERT_EQUAL(strcmp(line, "24040abc"), 0);
 
     /* Test addiu number 2*/
@@ -189,11 +189,11 @@ void test_translate() {
     fclose(file_out); 
     file_out = fopen("test_addiu2.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
-    printf("From file: %s\n", line);
     CU_ASSERT_EQUAL(strcmp(line, "2405000a"), 0);
 
-    /* Test lui */
+    /* Test lui number 1*/
     file_out = fopen("test_lui1.txt", "w");
     strcpy(name, "lui");
     char** lui = (char *[]){"$at", "10"};
@@ -202,9 +202,10 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_lui1.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
+
     CU_ASSERT_EQUAL(retval, 0);
-    printf("From file: %s\n", line);
     CU_ASSERT_EQUAL(strcmp(line, "3c01000a"), 0);
 
     /* Test lui number 2 */
@@ -214,6 +215,7 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_lui2.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "3c0b0214"), 0);
@@ -227,17 +229,19 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_ori1.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "3422bcde"), 0);
 
     /* Test ori number 2 */
     file_out = fopen("test_ori2.txt", "w");
-    char** ori2 = (char *[]){"$t3", "$t2", "$0x123"};
+    char** ori2 = (char *[]){"$t3", "$t2", "0x123"};
     retval = translate_inst(file_out, name, ori2, num_args, NULL, NULL, NULL);
     fclose(file_out);
     file_out = fopen("test_ori2.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "354b0123"), 0);
@@ -246,25 +250,27 @@ void test_translate() {
     /* Test addu */
     file_out = fopen("test_addu.txt", "w");
     strcpy(name, "addu");
-    char** addu = (char *[]){"$v0", "$at", "48350"};
+    char** addu = (char *[]){"$v0", "$a0", "$a1"};
     num_args = 3;
     retval = translate_inst(file_out, name, addu, num_args, NULL, NULL, NULL);
     fclose(file_out);
     file_out = fopen("test_addu.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(line, "00884821"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "00851021"), 0);
 
     /* Test or */
     file_out = fopen("test_or.txt", "w");
-    strcpy(name, "ori");
+    strcpy(name, "or");
     char** or = (char *[]){"$a0", "$a1", "$a3"};
     num_args = 3;
     retval = translate_inst(file_out, name, or, num_args, NULL, NULL, NULL);
     fclose(file_out);
     file_out = fopen("test_or.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "00a72025"), 0);
@@ -278,6 +284,7 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_slt1.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "0128302a"), 0);
@@ -289,6 +296,7 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_slt2.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "016a082a"), 0);
 
@@ -301,6 +309,7 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_sltu.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "0128302b"), 0);
 
@@ -313,6 +322,7 @@ void test_translate() {
     fclose(file_out);
     file_out = fopen("test_sll.txt", "r");
     fgets(line, sizeof(line), file_out);
+    strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "000a5fc0"), 0);
     /*

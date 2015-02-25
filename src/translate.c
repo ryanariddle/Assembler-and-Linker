@@ -111,27 +111,20 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
    find bitwise operations to be the cleanest way to complete this function.
  */
 int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
-    // if (num_args != 3 || !args[0] || !args[1] || !args[2] || funct > 33) {
-    //   printf("%s\n", "hi");
-    //   return -1;
-    // }
+
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
 
     uint32_t instruction = 0;
 
-    rd = rd << 10;
-    printf("%s%08x\n", "rd: ", rd);
-    rs = rs << 20;
-    printf("%s%08x\n", "rs: ", rs);
-    rt = rt << 15;
-    printf("%s%08x\n", "rt: ", rt);
+    rd = rd << 11;
+    rs = rs << 21;
+    rt = rt << 16;
 
-    instruction = instruction | rd | rs | rt | funct;
+    instruction = instruction ^ rd ^ rs ^ rt ^ funct;
 
     write_inst_hex(output, instruction);
-    printf("%08x\n", instruction);
     return 0;
 }
 
@@ -156,9 +149,9 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
     uint32_t instruction = 0;
 
-    rt = rt << 15;
-    rd = rd << 10;
-    shamt = shamt << 5;
+    rt = rt << 16;
+    rd = rd << 11;
+    shamt = shamt << 6;
     instruction = instruction ^ rt ^ rd ^ shamt ^ funct;
 
     write_inst_hex(output, instruction);
@@ -179,10 +172,10 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
       return -1;
     }
     uint32_t instruction = 0;
-    rs = rs << 20;
-    rt = rt <<  15;
-    opcode = opcode << 25;
-    instruction = instruction ^ rs ^ rt ^ opcode ^ imm;
+    rs = rs << 21;
+    rt = rt <<  16;
+    int o = opcode << 26;
+    instruction = instruction ^ rs ^ rt ^ o ^ imm;
     write_inst_hex(output, instruction);
     return 0;
 }
@@ -192,14 +185,14 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
   int rs = translate_reg(args[1]);
   int rt = translate_reg(args[0]);
   int err = translate_num(&imm, args[2], -2147483648, 2147483647);
-  if (err = -1) {
+  if (err == -1) {
     return -1;
   }
   uint32_t instruction = 0;
-  rs = rs << 20;
-  rt = rt << 15;
-  opcode = opcode << 25;
-  instruction = instruction ^ rs ^ rt ^ opcode ^ imm;
+  rs = rs << 21;
+  rt = rt << 16;
+  int o = opcode << 26;
+  instruction = instruction ^ rs ^ rt ^ o ^ imm;
   write_inst_hex(output, instruction);
   return 0;
 }
@@ -207,14 +200,14 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
   long int imm;
   int rt = translate_reg(args[0]);
-  int err = translate_num(&imm, args[2], -2147483648, 2147483647);
-  if (err = -1) {
+  int err = translate_num(&imm, args[1], -2147483648, 2147483647);
+  if (err == -1) {
     return -1;
   }
   uint32_t instruction = 0;
-  rt = rt << 15;
-  opcode = opcode << 25;
-  instruction = instruction ^ rt ^ opcode ^ imm;
+  rt = rt << 16;
+  int o = opcode << 26;
+  instruction = instruction ^ rt ^ o ^ imm;
   write_inst_hex(output, instruction);
   return 0;
 }
