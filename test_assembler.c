@@ -341,12 +341,13 @@ void test_translate() {
     strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
+    printf("Line: %s, should be: 01200008 \n", line);
     CU_ASSERT_EQUAL(strcmp(line, "01200008"), 0);
 
     /* Test lb */
     file_out = fopen("test_lb.txt", "w");
     strcpy(name, "lb");
-    char** lb = (char *[]){"$t2", "0", "$t1"}
+    char** lb = (char *[]){"$t2", "0", "$t1"};
     num_args = 3;
     retval = translate_inst(file_out, name, lb, num_args, NULL, NULL, NULL);
     fclose(file_out);
@@ -361,7 +362,7 @@ void test_translate() {
     /* Test lbu */
     file_out = fopen("test_lbu.txt", "w");
     strcpy(name, "lbu");
-    char** lb = (char *[]){"$t3", "-3", "$s2"};
+    char** lbu = (char *[]){"$t3", "-3", "$s2"};
     num_args = 3;
     retval = translate_inst(file_out, name, lbu, num_args, NULL, NULL, NULL);
     fclose(file_out);

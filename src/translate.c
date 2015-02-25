@@ -218,11 +218,12 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     if (err == -1) {
       return -1;
     }
-    int rs = translate_reg(args[0]) << 21;
-    int rt = translate_reg(args[2]) << 16;
+    imm = imm & 0xFFFF;
+    int rs = translate_reg(args[2]) << 21;
+    int rt = translate_reg(args[0]) << 16;
     int o = opcode << 26;
-
     uint32_t instruction = 0;
+    printf("rs: %08x; rt: %08x; o: %08x; imm: %08x\n", rs, rt, o, imm);
     instruction = instruction ^ o ^ rs ^ rt ^ imm;
     write_inst_hex(output, instruction);
     return 0;
