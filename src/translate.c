@@ -111,9 +111,10 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
    find bitwise operations to be the cleanest way to complete this function.
  */
 int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
-    if (num_args != 3 || !args[0] || !args[1] || !args[2] || funct > 33) {
-      return -1;
-    }
+    // if (num_args != 3 || !args[0] || !args[1] || !args[2] || funct > 33) {
+    //   printf("%s\n", "hi");
+    //   return -1;
+    // }
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
@@ -121,13 +122,16 @@ int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
     uint32_t instruction = 0;
 
     rd = rd << 10;
-    rs = rs << 21;
+    printf("%s%08x\n", "rd: ", rd);
+    rs = rs << 20;
+    printf("%s%08x\n", "rs: ", rs);
     rt = rt << 15;
+    printf("%s%08x\n", "rt: ", rt);
 
-    instruction = instruction ^ rd ^ rs ^ rt ^ funct;
+    instruction = instruction | rd | rs | rt | funct;
 
     write_inst_hex(output, instruction);
-
+    printf("%08x\n", instruction);
     return 0;
 }
 
@@ -180,6 +184,7 @@ int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     opcode = opcode << 25;
     instruction = instruction ^ rs ^ rt ^ opcode ^ imm;
     write_inst_hex(output, instruction);
+    return 0;
 }
 
 int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {

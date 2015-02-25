@@ -159,84 +159,162 @@ void test_table_2() {
 
 
 void test_translate() {
-    // DO WE NEED TO EMPTY CHAR BUFF EVERY TIME?!?!?!?!?
     int retval;
-    char buff[35];
+    FILE* file_out;
     char name[5];
-    /* Test addiu */
+    char line[256];
+
+    /* Test addiu number 1*/
+    file_out = fopen("test_addiu1.txt", "w");
     char** addiu1 = (char *[]){"$a0", "$0", "0xABC"};
     size_t num_args = 3;
     uint32_t addr;
     strcpy(name, "addiu");
-    retval = translate_inst(buff, name, addiu1, num_args, NULL, NULL, NULL);
-    CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "24040abc"), 0);
+    retval = translate_inst(file_out, name, addiu1, num_args, NULL, NULL, NULL);
+    CU_ASSERT_EQUAL(retval, 0)
+    fclose(file_out);
+    file_out = fopen("test_addiu1.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    char blah[50];
+    // printf("%s\n", blah);
+    printf("From file: %08x\n", line);
+    CU_ASSERT_EQUAL(strcmp(line, "24040abc"), 0);
+
+    /* Test addiu number 2*/
+    file_out = fopen("test_addiu2.txt", "w");
     char** addiu2 = (char *[]){"$a1", "$0", "10"};
-    retval = translate_inst(buff, name, addiu2, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, addiu2, num_args, NULL, NULL, NULL);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "2405000a"), 0);
+    fclose(file_out); 
+    file_out = fopen("test_addiu2.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    printf("From file: %s\n", line);
+    CU_ASSERT_EQUAL(strcmp(line, "2405000a"), 0);
+
     /* Test lui */
+    file_out = fopen("test_lui1.txt", "w");
     strcpy(name, "lui");
     char** lui = (char *[]){"$at", "10"};
     num_args = 2;
-    retval = translate_inst(buff, name, lui, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, lui, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_lui1.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "3c01000a"), 0);
+    printf("From file: %s\n", line);
+    CU_ASSERT_EQUAL(strcmp(line, "3c01000a"), 0);
+
+    /* Test lui number 2 */
+    file_out = fopen("test_lui2.txt", "w");
     char** lui2 = (char *[]){"$t3", "532"};
-    retval = translate_inst(buff, name, lui2, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, lui2, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_lui2.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "3c0b0214"), 0);
-    /* Test ori */
+    CU_ASSERT_EQUAL(strcmp(line, "3c0b0214"), 0);
+
+    /* Test ori number 1 */
+    file_out = fopen("test_ori1.txt", "w");
     strcpy(name, "ori");
     char** ori = (char *[]){"$v0", "$at", "48350"};
     num_args = 3;
-    retval = translate_inst(buff, name, ori, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, ori, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_ori1.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "3422bcde"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "3422bcde"), 0);
+
+    /* Test ori number 2 */
+    file_out = fopen("test_ori2.txt", "w");
     char** ori2 = (char *[]){"$t3", "$t2", "$0x123"};
-    num_args = 3;
-    retval = translate_inst(buff, name, ori2, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, ori2, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_ori2.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "354b0123"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "354b0123"), 0);
+
+
     /* Test addu */
+    file_out = fopen("test_addu.txt", "w");
     strcpy(name, "addu");
     char** addu = (char *[]){"$v0", "$at", "48350"};
     num_args = 3;
-    retval = translate_inst(buff, name, addu, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, addu, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_addu.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "00884821"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "00884821"), 0);
+
     /* Test or */
-    strcpy(name, "or");
+    file_out = fopen("test_or.txt", "w");
+    strcpy(name, "ori");
     char** or = (char *[]){"$a0", "$a1", "$a3"};
     num_args = 3;
-    retval = translate_inst(buff, name, or, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, or, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_or.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "00a72025"), 0);
-    /* Test slt */
+    CU_ASSERT_EQUAL(strcmp(line, "00a72025"), 0);
+
+    /* Test slt number 1 */
+    file_out = fopen("test_slt1.txt", "w");
     strcpy(name, "slt");
     char** slt = (char *[]){"$a2", "$t1", "$t0"};
     num_args = 3;
-    retval = translate_inst(buff, name, slt, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, slt, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_slt1.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "0128302a"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "0128302a"), 0);
+
+    /* Test slt number 2 */
+    file_out = fopen("test_slt2.txt", "w");
     char** slt2 = (char *[]){"$at", "$t3", "$t2"};
-    retval = translate_inst(buff, name, slt2, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, slt2, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_slt2.txt", "r");
+    fgets(line, sizeof(line), file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "016a082a"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "016a082a"), 0);
+
     /* Test sltu */
+    file_out = fopen("test_sltu.txt", "w");
     strcpy(name, "sltu");
     char** sltu = (char *[]){"$a2", "$t1", "$t0"};
     num_args = 3;
-    retval = translate_inst(buff, name, sltu, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, sltu, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_sltu.txt", "r");
+    fgets(line, sizeof(line), file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "0128302b"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "0128302b"), 0);
+
     /* Test sll */
+    file_out = fopen("test_sll.txt", "w");
     strcpy(name, "sll");
     char** sll = (char *[]){"$t3", "$t2", "31"};
     num_args = 3;
-    retval = translate_inst(buff, name, sll, num_args, NULL, NULL, NULL);
+    retval = translate_inst(file_out, name, sll, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_sll.txt", "r");
+    fgets(line, sizeof(line), file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(buff, "000a5fc0"), 0);
+    CU_ASSERT_EQUAL(strcmp(line, "000a5fc0"), 0);
     /*
     This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.
     Still need to test:
