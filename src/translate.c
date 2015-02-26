@@ -160,12 +160,6 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
   //Not sure about this
-  int o = opcode << 26;
-  int addr = translate_reg(args[0]);
-  uint32_t instruction = 0;
-  instruction = instruction ^ o ^ addr;
-  write_inst_hex(output, instruction);
-  return 0;
 }
 
 int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
