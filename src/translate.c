@@ -159,7 +159,12 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 }
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
-  //NEED TO DO THIS
+  //Not sure about this
+  int o = opcode << 26;
+  int addr = translate_reg(args[0]);
+  uint32_t instruction = 0;
+  instruction = instruction ^ o ^ addr;
+  write_inst_hex(output, instruction);
   return 0;
 }
 
@@ -236,14 +241,20 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args,
 }
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
-    //NEED TO FINISH THIS
     uint32_t addr, SymbolTable* reltbl) {
+    //Not sure about this
     int o = opcode << 26;
-    if (opcode == 0x2) {
-
-    } else {
-
+    err = add_to_table(reltbl, args[0], addr);
+    if (err = -1) {
+      /*  Is it an error if we add the same thing into the table, I think
+          that we can have "j HERE" twice in the mips code. But then the addr
+          would be different and I don't think it would error.
+      */
+      return -1;
     }
+    uint32_t instruction = 0;
+    instruction = instruction ^ o;
+    write_inst_hex(output, instruction);
     return 0;
 }
 
