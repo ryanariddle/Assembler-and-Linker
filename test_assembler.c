@@ -481,6 +481,20 @@ void test_translate() {
     CU_ASSERT_EQUAL(retval, 0);
     // CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
 
+    /* Test pass_two*/
+    file_input = fopen("test_pass_two.txt", "w");
+    fprintf(file_input, "addu $s1 $s1 $0\n", );
+    fclose(file_input);
+    file_result = fopen("test_pass_two_result", "w");
+    fclose(file_result);
+    retval = pass_two(file_input, file_result, symtbl, reltbl);
+    file_result = fopen("test_pass_two_result.txt", "r");
+    fgets(line, sizeof(line), file_result);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    printf("%s\n", line);
+
     /*
     This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.
     Still need to test:
