@@ -40,16 +40,37 @@
  */
 unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
     if (strcmp(name, "li") == 0) {
-        // if (sizeof (args) / sizeof (char) == num_args) {
-        //   /* DO STUFF*/
-        //   return 1;
-        // }
+        if (num_args == 2) {
+          int * output1;
+          uint32_t num = translate_num(output1, name, -2147483648, 4294967295);
+          if (num == -1) {
+            return 0;
+          }
+          int * output2;
+          uint16_t lo = -32767;
+          uint16_t hi = 6553;
+          uint32_t num2 = translate_num(output2, name, lo, hi);
+
+          if (num2 != -1) {
+            fprintf(output, "addiu $a0 $0 %d\n", *output2);
+            return 1;
+          }
+
+          int upper = *output1 >> 16;
+          upper = upper << 16;
+          int lower = *output1 << 16;
+          lower = lower >> 16;
+          fprintf(output, "lui $at %d\n", upper);
+          fprintf(output, "ori %s $at %d\n", args[0], lower);
+          return 1;
+        }
         return 0;
     } else if (strcmp(name, "blt") == 0) {
-        // if (sizeof (args) / sizeof (char) == num_args) {
-        //   /* DO STUFF*/
-        //   return 1;
-        // }
+        if (num_args == 3) {
+          fprintf(output, "slt $t0 %s %s\n", args[0], args[1]);
+          fprintf(output, "bne $t0 $0 %s\n", args[2]);
+          return 1;
+        }
         return 0;
     } else {
         write_inst_string(output, name, args, num_args);
