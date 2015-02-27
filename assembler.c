@@ -141,28 +141,23 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
     int line_num, byte_offset, result, count_args, err;
     result = 0;
     byte_offset = 0;
-    printf("%s\n", "hello");
     // First, read the next line into a buffer.
-    printf("HELLO\n");
     char* next_args[MAX_ARGS];
-    char* splitter, first_arg;
+    char* splitter;
+    char first_arg[10];
 
     while (fgets(buf, BUF_SIZE, input)) {
-        printf("HELLO1\n");
-
         err = 0;
         splitter = strtok(buf, " ");
         if (splitter != NULL) {
-            first_arg = splitter;
-            splitter ++;
+            strcpy(first_arg, splitter);
+            splitter = strtok(NULL, " ,.-\n");
             count_args = 0;
             while (splitter != NULL) {
                 next_args[count_args] = splitter;
-                splitter = strtok(NULL, " ");
+                splitter = strtok(NULL, " ,.-\n");
                 count_args++;
             }
-        printf("HELLO2\n");
-
             err = translate_inst(output, first_arg, next_args, count_args, byte_offset * 4, symtbl, reltbl);
             
         } else {
@@ -170,10 +165,12 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
         }
         byte_offset++;
         line_num++;
+
         if (err == -1) {
             result = -1;
         }
         // if nothing, go to next line
+        printf("RESULT %d\n\n", result);
 
     }
     // Next, use strtok() to scan for next character. If there's nothing,
@@ -252,7 +249,8 @@ int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
         if (pass_two(src, dst, symtbl, reltbl) != 0) {
             err = 1;
         }
-        
+
+        /*THIS IS THE ERROR*/
         fprintf(dst, "\n.symbol\n");
         write_table(symtbl, dst);
 

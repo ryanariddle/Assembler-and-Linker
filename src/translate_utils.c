@@ -71,6 +71,7 @@ int translate_num(long int* output, const char* str, long int lower_bound,
       *output = result;
       return 0;
     }
+
     return -1;
     }
     

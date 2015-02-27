@@ -103,6 +103,12 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
     if (!(args_helper(args) && num_args_helper(num_args) && addr_helper(addr))) {
       return -1;
     }
+    printf("NAME: %s\n", name);
+    int i =0;
+    for (i = 0; i < num_args; i++) {
+      printf("ARG %d: %s\n", i, args[i]);
+    }
+    printf("NUM ARGS: %d\n", num_args);
     if (strcmp(name, "addu") == 0)       return write_rtype (0x21, output, args, num_args);
     else if (strcmp(name, "or") == 0)    return write_rtype (0x25, output, args, num_args);
     else if (strcmp(name, "slt") == 0)   return write_rtype (0x2a, output, args, num_args);
