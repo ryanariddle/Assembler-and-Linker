@@ -341,7 +341,6 @@ void test_translate() {
     strtok(line, "\n");
     fclose(file_out);
     CU_ASSERT_EQUAL(retval, 0);
-    printf("Line: %s, should be: 01200008 \n", line);
     CU_ASSERT_EQUAL(strcmp(line, "01200008"), 0);
 
     /* Test lb */
@@ -357,7 +356,6 @@ void test_translate() {
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "812a0000"), 0);
-    /*
 
     /* Test lbu */
     file_out = fopen("test_lbu.txt", "w");
@@ -373,19 +371,126 @@ void test_translate() {
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "924bfffd"), 0);
 
+    /* Test lw*/
+    file_out = fopen("test_lw.txt", "w");
+    strcpy(name, "lw");
+    char** lw = (char *[]){"$t3", "32767", "$t1"};
+    num_args = 3;
+    retval = translate_inst(file_out, name, lw, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_lw.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "8d2b7fff"), 0);
+
+    /* Test sb*/
+    file_out = fopen("test_sb.txt", "w");
+    strcpy(name, "sb");
+    char** sb = (char *[]){"$t2", "0", "$t1"};
+    num_args = 3;
+    retval = translate_inst(file_out, name, sb, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_sb.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "a12a0000"), 0);
+
+    /* Test sw*/
+    file_out = fopen("test_sw.txt", "w");
+    strcpy(name, "sw");
+    char** sw = (char *[]){"$t2", "-32768", "$t1"};
+    num_args = 3;
+    retval = translate_inst(file_out, name, sw, num_args, NULL, NULL, NULL);
+    fclose(file_out);
+    file_out = fopen("test_sw.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "ad2a8000"), 0);
+
+    /* Test j*/
+    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(reltbl);
+    uint32_t j_address = 0;
+    file_out = fopen("test_j.txt", "w");
+    strcpy(name, "j");
+    char** j = (char *[]){"startLoop"};
+    num_args = 1;
+    retval = translate_inst(file_out, name, j, num_args, j_address, NULL, reltbl);
+    fclose(file_out);
+    file_out = fopen("test_j.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "08000000"), 0);
+
+
+    /* Test jal*/
+    file_out = fopen("test_jal.txt", "w");
+    uint32_t jal_address = 0;
+    strcpy(name, "jal");
+    char** jal = (char *[]){"myFunc"};
+    num_args = 1;
+    retval = translate_inst(file_out, name, jal, num_args, jal_address, NULL, reltbl);
+    fclose(file_out);
+    file_out = fopen("test_jal.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "0c000000"), 0);
+
+    /* Test beq*/
+    SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
+    CU_ASSERT_PTR_NOT_NULL(symtbl);
+    file_out = fopen("test_beq.txt", "w");
+    uint32_t beq_address = 0;
+    strcpy(name, "beq");
+    char** beq = (char *[]){"$t0", "$a1", "endLoop"};
+    num_args = 1;
+    retval = translate_inst(file_out, name, beq, num_args, beq_address, symtbl, NULL);
+    fclose(file_out);
+    file_out = fopen("test_beq.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
+
+    /* Test bne*/
+    file_out = fopen("test_bne.txt", "w");
+    uint32_t bne_address = 0;
+    strcpy(name, "bne");
+    char** bne = (char *[]){"$t3", "$a0", "myFunc"};
+    num_args = 1;
+    retval = translate_inst(file_out, name, bne, num_args, bne_address, symtbl, NULL);
+    fclose(file_out);
+    file_out = fopen("test_bne.txt", "r");
+    fgets(line, sizeof(line), file_out);
+    fclose(file_out);
+    strtok(line, "\n");
+    CU_ASSERT_EQUAL(retval, 0);
+    CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
+
     /*
     This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.
     Still need to test:
         - jr^
         - lb^
-        - lbu
-        - lw
-        - sb
-        - sw
-        - beq
-        - bne
-        - j
-        - jal
+        - lbu^
+        - lw^
+        - sb^
+        - sw^
+        - beq - fix
+        - bne - fix
+        - j^
+        - jal^
     */
 }
 

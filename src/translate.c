@@ -160,6 +160,7 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
   //Not sure about this
+  return 0;
 }
 
 int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
@@ -222,7 +223,7 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rt = translate_reg(args[0]) << 16;
     int o = opcode << 26;
     uint32_t instruction = 0;
-    printf("rs: %08x; rt: %08x; o: %08x; imm: %08x\n", rs, rt, o, imm);
+    // printf("rs: %08x; rt: %08x; o: %08x; imm: %08x\n", rs, rt, o, imm);
     instruction = instruction ^ o ^ rs ^ rt ^ imm;
     write_inst_hex(output, instruction);
     return 0;
@@ -236,14 +237,9 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args,
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
     uint32_t addr, SymbolTable* reltbl) {
-    //Not sure about this
     int o = opcode << 26;
-    err = add_to_table(reltbl, args[0], addr);
-    if (err = -1) {
-      /*  Is it an error if we add the same thing into the table, I think
-          that we can have "j HERE" twice in the mips code. But then the addr
-          would be different and I don't think it would error.
-      */
+    int err = add_to_table(reltbl, args[0], addr);
+    if (err == -1) {
       return -1;
     }
     uint32_t instruction = 0;
