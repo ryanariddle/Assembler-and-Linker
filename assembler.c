@@ -134,14 +134,10 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
    If an error is reached, DO NOT EXIT the function. Keep translating the rest of
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
 int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl) {
-    /* YOUR CODE HERE */
-    // Since we pass this buffer to strtok(), the chars here will GET CLOBBERED.
     char buf[BUF_SIZE];
-    // Store input line number / byte offset below. When should each be incremented?
     int line_num, byte_offset, result, count_args, err;
     result = 0;
     byte_offset = 0;
-    // First, read the next line into a buffer.
     char* next_args[MAX_ARGS];
     char* splitter;
     char first_arg[10];
@@ -151,11 +147,11 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
         splitter = strtok(buf, " ");
         if (splitter != NULL) {
             strcpy(first_arg, splitter);
-            splitter = strtok(NULL, " ,.-\n");
+            splitter = strtok(NULL, IGNORE_CHARS);
             count_args = 0;
             while (splitter != NULL) {
                 next_args[count_args] = splitter;
-                splitter = strtok(NULL, " ,.-\n");
+                splitter = strtok(NULL, IGNORE_CHARS);
                 count_args++;
             }
             err = translate_inst(output, first_arg, next_args, count_args, byte_offset * 4, symtbl, reltbl);
@@ -169,22 +165,7 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
         if (err == -1) {
             result = -1;
         }
-        // if nothing, go to next line
-        printf("RESULT %d\n\n", result);
-
     }
-    // Next, use strtok() to scan for next character. If there's nothing,
-    // go to the next line.
-
-    // Parse for instruction arguments. You should use strtok() to tokenize
-    // the rest of the line. Extra arguments should be filtered out in pass_one(),
-    // so you don't need to worry about that here.
-
-    // Use translate_inst() to translate the instruction and write to output file.
-    // If an error occurs, the instruction will not be written and you should call
-    // raise_inst_error(). 
-
-    // Repeat until no more characters are left, and the return the correct return val
     return result;
 }
 
@@ -250,7 +231,6 @@ int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
             err = 1;
         }
 
-        /*THIS IS THE ERROR*/
         fprintf(dst, "\n.symbol\n");
         write_table(symtbl, dst);
 
