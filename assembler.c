@@ -135,40 +135,60 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
 int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl) {
     /* YOUR CODE HERE */
-    int line_num, byte_offset;
-
     // Since we pass this buffer to strtok(), the chars here will GET CLOBBERED.
     char buf[BUF_SIZE];
     // Store input line number / byte offset below. When should each be incremented?
-    FILE* read_file = fopen(input, "r");
-    char * pch;
-    while (fgets(buf, BUF_SIZE, read_file)) {
-        pch = strtok(buf, " ");
-        while (pch+1) {
-            fprintf(output, "%s ", )
-            pch++;
-        }
-        fprintf(output, "%s\n", pch);
-        pch++;
-    }
+    int line_num, byte_offset, result, count_args, err;
+    result = 0;
+    byte_offset = 0;
+    printf("%s\n", "hello");
     // First, read the next line into a buffer.
+    printf("HELLO\n");
+    char* next_args[MAX_ARGS];
+    char* splitter, first_arg;
 
+    while (fgets(buf, BUF_SIZE, input)) {
+        printf("HELLO1\n");
+
+        err = 0;
+        splitter = strtok(buf, " ");
+        if (splitter != NULL) {
+            first_arg = splitter;
+            splitter ++;
+            count_args = 0;
+            while (splitter != NULL) {
+                next_args[count_args] = splitter;
+                splitter = strtok(NULL, " ");
+                count_args++;
+            }
+        printf("HELLO2\n");
+
+            err = translate_inst(output, first_arg, next_args, count_args, byte_offset * 4, symtbl, reltbl);
+            
+        } else {
+            result = -1;
+        }
+        byte_offset++;
+        line_num++;
+        if (err == -1) {
+            result = -1;
+        }
+        // if nothing, go to next line
+
+    }
     // Next, use strtok() to scan for next character. If there's nothing,
     // go to the next line.
 
     // Parse for instruction arguments. You should use strtok() to tokenize
     // the rest of the line. Extra arguments should be filtered out in pass_one(),
     // so you don't need to worry about that here.
-    char* args[MAX_ARGS];
-    int num_args = 0;
 
     // Use translate_inst() to translate the instruction and write to output file.
     // If an error occurs, the instruction will not be written and you should call
     // raise_inst_error(). 
 
     // Repeat until no more characters are left, and the return the correct return val
-
-    return -1;
+    return result;
 }
 
 /*******************************
