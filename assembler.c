@@ -135,11 +135,22 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
    the document, and at the end, return -1. Return 0 if no errors were encountered. */
 int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl) {
     /* YOUR CODE HERE */
+    int line_num, byte_offset;
 
     // Since we pass this buffer to strtok(), the chars here will GET CLOBBERED.
     char buf[BUF_SIZE];
     // Store input line number / byte offset below. When should each be incremented?
-
+    FILE* read_file = fopen(input, "r");
+    char * pch;
+    while (fgets(buf, BUF_SIZE, read_file)) {
+        pch = strtok(buf, " ");
+        while (pch+1) {
+            fprintf(output, "%s ", )
+            pch++;
+        }
+        fprintf(output, "%s\n", pch);
+        pch++;
+    }
     // First, read the next line into a buffer.
 
     // Next, use strtok() to scan for next character. If there's nothing,
