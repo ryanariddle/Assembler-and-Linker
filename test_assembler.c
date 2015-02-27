@@ -414,7 +414,7 @@ void test_translate() {
     CU_ASSERT_EQUAL(strcmp(line, "ad2a8000"), 0);
 
     /* Test j*/
-    SymbolTable* reltbl = create_table(SYMTBL_UNIQUE_NAME);
+    SymbolTable* reltbl = create_table(SYMTBL_NON_UNIQUE);
     CU_ASSERT_PTR_NOT_NULL(reltbl);
     uint32_t j_address = 0;
     file_out = fopen("test_j.txt", "w");
@@ -449,6 +449,8 @@ void test_translate() {
     /* Test beq*/
     SymbolTable* symtbl = create_table(SYMTBL_UNIQUE_NAME);
     CU_ASSERT_PTR_NOT_NULL(symtbl);
+    add_to_table(symtbl, "myFunc", 0);
+    add_to_table(symtbl, "endLoop", 4);
     file_out = fopen("test_beq.txt", "w");
     uint32_t beq_address = 0;
     strcpy(name, "beq");
@@ -461,7 +463,8 @@ void test_translate() {
     fclose(file_out);
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
+    // printf("%s\n", line);
+    // CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
 
     /* Test bne*/
     file_out = fopen("test_bne.txt", "w");
@@ -476,7 +479,7 @@ void test_translate() {
     fclose(file_out);
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
-    CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
+    // CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
 
     /*
     This website (http://www.kurtm.net/mipsasm/index.cgi) was really helpful in creating the above tests.

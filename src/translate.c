@@ -159,8 +159,13 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 }
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
-  //Not sure about this
-  return 0;
+    
+    int rs = translate_reg(args[0]);
+    rs = rs << 21; 
+    uint32_t instruction = 0;
+    instruction = instruction ^ rs ^ funct;
+    write_inst_hex(output, instruction);
+    return 0;
 }
 
 int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
@@ -229,10 +234,32 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     return 0;
 }
 
+
+
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
     uint32_t addr, SymbolTable* symtbl) {
-  //NEED TO DO THIS
-  return 0;
+
+    // //beq $t0, $0, Label <--- need this
+
+    int rs = translate_reg(args[0]) << 21;
+    int rt = translate_reg(args[1]) << 16;
+    char * target_name = args[2];
+    int op = opcode << 26;
+    int result;
+    if (symtbl) {
+      uint64_t a = get_addr_for_symbol(symtbl, target_name);
+      if (a == -1) {
+        return -1;
+      }
+      result = a - addr;
+      result = result << 2;
+    } else {
+      return -1;
+    }
+    uint32_t instruction = 0;
+    instruction = instruction ^ rs ^ rt ^ result;
+    write_inst_hex(output, instruction);
+    return 0;
 }
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
