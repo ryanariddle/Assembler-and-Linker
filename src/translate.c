@@ -41,25 +41,19 @@
 unsigned write_pass_one(FILE* output, const char* name, char** args, int num_args) {
     if (strcmp(name, "li") == 0) {
         if (num_args == 2) {
-          int * output1;
-          uint32_t num = translate_num(output1, name, -2147483648, 4294967295);
+          long int out1;
+          uint32_t num = translate_num(&out1, args[1], -2147483648, 4294967295);
           if (num == -1) {
             return 0;
           }
-          int * output2;
-          uint16_t lo = -32767;
-          uint16_t hi = 6553;
-          uint32_t num2 = translate_num(output2, name, lo, hi);
-
+          long int out2;
+          uint32_t num2 = translate_num(&out2, args[1], -32767, 6553);
           if (num2 != -1) {
-            fprintf(output, "addiu $a0 $0 %d\n", *output2);
+            fprintf(output, "addiu %s $0 %d\n", args[0], out2);
             return 1;
           }
-
-          int upper = *output1 >> 16;
-          upper = upper << 16;
-          int lower = *output1 << 16;
-          lower = lower >> 16;
+          uint16_t upper =  (out1 & 0xFFFF000) >> 16;
+          uint16_t lower =( out1 << 15) >> 15;
           fprintf(output, "lui $at %d\n", upper);
           fprintf(output, "ori %s $at %d\n", args[0], lower);
           return 1;
@@ -67,8 +61,8 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
         return 0;
     } else if (strcmp(name, "blt") == 0) {
         if (num_args == 3) {
-          fprintf(output, "slt $t0 %s %s\n", args[0], args[1]);
-          fprintf(output, "bne $t0 $0 %s\n", args[2]);
+          fprintf(output, "slt $at %s %s\n", args[0], args[1]);
+          fprintf(output, "bne $at $0 %s\n", args[2]);
           return 1;
         }
         return 0;
@@ -249,7 +243,6 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
     int rt = translate_reg(args[0]) << 16;
     int o = opcode << 26;
     uint32_t instruction = 0;
-    // printf("rs: %08x; rt: %08x; o: %08x; imm: %08x\n", rs, rt, o, imm);
     instruction = instruction ^ o ^ rs ^ rt ^ imm;
     write_inst_hex(output, instruction);
     return 0;
@@ -259,9 +252,6 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
     uint32_t addr, SymbolTable* symtbl) {
-
-    // //beq $t0, $0, Label <--- need this
-
     int rs = translate_reg(args[0]) << 21;
     int rt = translate_reg(args[1]) << 16;
     char * target_name = args[2];

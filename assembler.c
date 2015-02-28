@@ -76,7 +76,6 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
     if (str[len - 1] == ':') {
         str[len - 1] = '\0';
         if (is_valid_label(str)) {
-            printf("LINE: %d SPLITTER: %s OFFSET: %d\n", input_line, str, byte_offset);
             if (add_to_table(symtbl, str, byte_offset) == 0) {
                 return 1;
             } else {
@@ -126,15 +125,14 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
     char instruction[10];
     result = 0, line = 0, byte = 0;
     while (fgets(buf, BUF_SIZE, input)) {
+        skip_comment(buf);
         splitter = strtok(buf, IGNORE_CHARS);
         if (splitter != NULL) {
             err = add_if_label(line, splitter, byte, symtbl);
-            printf("%d\n", err);
             if (err != 0) {
                 splitter = strtok(NULL, IGNORE_CHARS);
             }
             if (splitter != NULL) {
-                printf("%s\n", splitter);
                 strcpy(instruction, splitter);
                 i = 0;
                 splitter = strtok(NULL, IGNORE_CHARS);
@@ -251,7 +249,7 @@ int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
         if (pass_one(src, dst, symtbl) != 0) {
             err = 1;
         }
-        
+
         close_files(src, dst);
     }
 
