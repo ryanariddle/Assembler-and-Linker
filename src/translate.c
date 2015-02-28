@@ -266,19 +266,18 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args,
     int rt = translate_reg(args[1]) << 16;
     char * target_name = args[2];
     int op = opcode << 26;
-    int result;
+    uint16_t result;
     if (symtbl) {
       uint64_t a = get_addr_for_symbol(symtbl, target_name);
       if (a == -1) {
         return -1;
       }
-      result = a - addr;
-      result = result << 2;
+      result = ((a - addr) >> 2) - 1;
     } else {
       return -1;
     }
     uint32_t instruction = 0;
-    instruction = instruction ^ rs ^ rt ^ result;
+    instruction = instruction ^ rs ^ rt ^ op ^ result;
     write_inst_hex(output, instruction);
     return 0;
 }
