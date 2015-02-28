@@ -52,7 +52,7 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
             fprintf(output, "addiu %s $0 %d\n", args[0], out2);
             return 1;
           }
-          uint16_t upper =  (out1 & 0xFFFF000) >> 16;
+          uint16_t upper =  (out1 & 0xFFFF0000) >> 16;
           uint16_t lower =( out1 << 15) >> 15;
           fprintf(output, "lui $at %d\n", upper);
           fprintf(output, "ori %s $at %d\n", args[0], lower);
@@ -94,9 +94,11 @@ unsigned write_pass_one(FILE* output, const char* name, char** args, int num_arg
  */
 int translate_inst(FILE* output, const char* name, char** args, size_t num_args, uint32_t addr,
     SymbolTable* symtbl, SymbolTable* reltbl) {
-    if (!(args_helper(args) && num_args_helper(num_args) && addr_helper(addr))) {
+
+    if (num_args > 3) {
       return -1;
     }
+
     if (strcmp(name, "addu") == 0)       return write_rtype (0x21, output, args, num_args);
     else if (strcmp(name, "or") == 0)    return write_rtype (0x25, output, args, num_args);
     else if (strcmp(name, "slt") == 0)   return write_rtype (0x2a, output, args, num_args);
@@ -127,6 +129,9 @@ int translate_inst(FILE* output, const char* name, char** args, size_t num_args,
  */
 int write_rtype(uint8_t funct, FILE* output, char** args, size_t num_args) {
 
+    if (num_args != 3) {
+      return -1;
+    }
     int rd = translate_reg(args[0]);
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[2]);
@@ -174,7 +179,10 @@ int write_shift(uint8_t funct, FILE* output, char** args, size_t num_args) {
 }
 
 int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
-    
+    if (num_args != 1) {
+      return -1;
+    }
+
     int rs = translate_reg(args[0]);
     rs = rs << 21; 
     uint32_t instruction = 0;
@@ -184,23 +192,31 @@ int write_jr(uint8_t funct, FILE* output, char** args, size_t num_args) {
 }
 
 int write_addiu(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+    if (num_args != 3) {
+      return -1;
+    }
     long int imm;
     int rs = translate_reg(args[1]);
     int rt = translate_reg(args[0]);
-    int err = translate_num(&imm, args[2], -2147483648, 2147483647);
+    int err = translate_num(&imm, args[2], -32767, 6553);
     if (err == -1) {
       return -1;
     }
+    imm = imm & 0xFFFF;
     uint32_t instruction = 0;
     rs = rs << 21;
     rt = rt <<  16;
     int o = opcode << 26;
     instruction = instruction ^ rs ^ rt ^ o ^ imm;
+
     write_inst_hex(output, instruction);
     return 0;
 }
 
 int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  if (num_args != 3) {
+    return -1;
+  }
   long int imm;
   int rs = translate_reg(args[1]);
   int rt = translate_reg(args[0]);
@@ -218,6 +234,9 @@ int write_ori(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 }
 
 int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+  if (num_args != 2) {
+    return -1;
+  }
   long int imm;
   int rt = translate_reg(args[0]);
   int err = translate_num(&imm, args[1], -2147483648, 2147483647);
@@ -233,6 +252,9 @@ int write_lui(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 }
 
 int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
+    if (num_args != 3) {
+      return -1;
+    }
     long int imm;
     int err = translate_num(&imm, args[1], -2147483648, 2147483647);
     if (err == -1) {
@@ -252,6 +274,9 @@ int write_mem(uint8_t opcode, FILE* output, char** args, size_t num_args) {
 
 int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args, 
     uint32_t addr, SymbolTable* symtbl) {
+    if (num_args > 3) {
+      return -1;
+    }
     int rs = translate_reg(args[0]) << 21;
     int rt = translate_reg(args[1]) << 16;
     char * target_name = args[2];
@@ -274,6 +299,9 @@ int write_branch(uint8_t opcode, FILE* output, char** args, size_t num_args,
 
 int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args, 
     uint32_t addr, SymbolTable* reltbl) {
+    if (num_args != 1) {
+      return -1;
+    }
     int o = opcode << 26;
     int err = add_to_table(reltbl, args[0], addr);
     if (err == -1) {
@@ -283,26 +311,4 @@ int write_jump(uint8_t opcode, FILE* output, char** args, size_t num_args,
     instruction = instruction ^ o;
     write_inst_hex(output, instruction);
     return 0;
-}
-
-
-/* Helper function that checks if args are valid inputs. */
-int args_helper(char** args) {
-  //NEED TO DO THIS
-  return 1;
-}
-
-/* Helper function that checks if num_args is a valid input. */
-int num_args_helper(size_t num_args) {
-  //Could improve this
-  if (num_args < 0) {
-    return 0;
-  }
-  return 1;
-}
-
-/* Helper function that checks if addr is a valid input. */
-int addr_helper(uint32_t addr) {
-  //NEED TO DO THIS
-  return 1;
 }

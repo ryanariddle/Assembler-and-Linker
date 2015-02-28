@@ -120,11 +120,12 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
  */
 int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
     char buf[BUF_SIZE], *args[MAX_ARGS];
-    int err, result, line, i, byte;
+    int err, result, line, i, byte, pass;
     char* splitter;
     char instruction[10];
     result = 0, line = 0, byte = 0;
     while (fgets(buf, BUF_SIZE, input)) {
+        pass = 1;
         skip_comment(buf);
         splitter = strtok(buf, IGNORE_CHARS);
         if (splitter != NULL) {
@@ -138,13 +139,20 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
                 splitter = strtok(NULL, IGNORE_CHARS);
                 while (splitter != NULL) {
                     if (i > MAX_ARGS) {
+                        pass = 0;
                         raise_extra_arg_error(line, splitter);
                     }
                     args[i] = splitter;
                     i++;
                     splitter = strtok(NULL, IGNORE_CHARS);
                 }
-                write_pass_one(output, instruction, args, i);
+                if (write_pass_one(output, instruction, args, i) == 0 && pass) {
+                    err = -1;
+                }
+                long int temp;
+                if (strcmp(instruction, "blt") == 0 || (strcmp(instruction, "li") == 0 && translate_num(&temp, args[1], -32767, 6553) == -1)) {
+                    byte += 4;
+                }
                 byte += 4;
             }
 
@@ -152,7 +160,7 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
                 result = -1;
             }
         }
-        line ++;
+        line++;
     }
 
     return result;
