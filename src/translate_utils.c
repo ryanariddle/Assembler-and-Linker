@@ -64,6 +64,7 @@ int translate_num(long int* output, const char* str, long int lower_bound,
       result = strtol(str, &pEnd, 16);
     } else if (strlen(str) >= 1 && str[1] != 'x') {
       result = strtol(str, &pEnd, 10);
+
     } else {
       return -1;
     }

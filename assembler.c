@@ -120,8 +120,38 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
    it should return 0.
  */
 int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
-    /* YOUR CODE HERE */
-    return -1;
+    char buf[BUF_SIZE], args[MAX_ARGS];
+    int err, result, line, i;
+    char* splitter;
+    char instruction[BUF_SIZE];
+    result = 0, line = 0;
+    while (fgets(buf, BUF_SIZE, input)) {
+        skip_comment(buf);
+        splitter = strtok(NULL, IGNORE_CHARS);
+        err = add_if_label(line, splitter, (line + 1)* 4, symtbl);
+        if (err != 0) {
+            splitter = strtok(NULL, IGNORE_CHARS);
+        }
+        printf("hi\n");
+        strcpy(instruction, splitter);
+        i = 0;
+        printf("fuck you\n");
+
+        while (splitter != NULL) {
+            if (i > MAX_ARGS) {
+                raise_extra_arg_error(line, splitter);
+            }
+            splitter = strtok(NULL, IGNORE_CHARS);
+            args[i] = splitter;
+            i++;
+        }
+        write_pass_one(output, instruction, args, i - 1);
+        if (err == -1) {
+            result = -1;
+        }
+        line++;
+    }
+    return result;
 }
 
 /* Reads an intermediate file and translates it into machine code. You may assume:
@@ -144,7 +174,7 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
 
     while (fgets(buf, BUF_SIZE, input)) {
         err = 0;
-        splitter = strtok(buf, " ");
+        splitter = strtok(buf, IGNORE_CHARS);
         if (splitter != NULL) {
             strcpy(first_arg, splitter);
             splitter = strtok(NULL, IGNORE_CHARS);

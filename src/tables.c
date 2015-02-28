@@ -131,7 +131,6 @@ int64_t get_addr_for_symbol(SymbolTable* table, const char* name) {
  */
 void write_table(SymbolTable* table, FILE* output) {
     int i;
-    fprintf(output, "%s\n", ".symbol");
     Symbol* t = (*table).tbl;
     for (i = 0; i < (*table).len; i++) {
       write_symbol(output, t->addr, t->name);
