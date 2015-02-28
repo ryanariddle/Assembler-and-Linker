@@ -76,6 +76,7 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
     if (str[len - 1] == ':') {
         str[len - 1] = '\0';
         if (is_valid_label(str)) {
+            printf("LINE: %d SPLITTER: %s OFFSET: %d\n", input_line, str, byte_offset);
             if (add_to_table(symtbl, str, byte_offset) == 0) {
                 return 1;
             } else {
@@ -120,36 +121,42 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
  */
 int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
     char buf[BUF_SIZE], *args[MAX_ARGS];
-    int err, result, line, i;
+    int err, result, line, i, byte;
     char* splitter;
     char instruction[10];
-    result = 0, line = 0;
+    result = 0, line = 0, byte = 0;
     while (fgets(buf, BUF_SIZE, input)) {
         splitter = strtok(buf, IGNORE_CHARS);
         if (splitter != NULL) {
-            err = add_if_label(line, splitter, (line + 1)* 4, symtbl);
+            err = add_if_label(line, splitter, byte, symtbl);
+            printf("%d\n", err);
             if (err != 0) {
                 splitter = strtok(NULL, IGNORE_CHARS);
             }
-            strcpy(instruction, splitter);
-            i = 0;
-            splitter = strtok(NULL, IGNORE_CHARS);
-            while (splitter != NULL) {
-                if (i > MAX_ARGS) {
-                    raise_extra_arg_error(line, splitter);
-                }
-                
-                args[i] = splitter;
-                i++;
+            if (splitter != NULL) {
+                printf("%s\n", splitter);
+                strcpy(instruction, splitter);
+                i = 0;
                 splitter = strtok(NULL, IGNORE_CHARS);
+                while (splitter != NULL) {
+                    if (i > MAX_ARGS) {
+                        raise_extra_arg_error(line, splitter);
+                    }
+                    args[i] = splitter;
+                    i++;
+                    splitter = strtok(NULL, IGNORE_CHARS);
+                }
+                write_pass_one(output, instruction, args, i);
+                byte += 4;
             }
-            write_pass_one(output, instruction, args, i);
+
             if (err == -1) {
                 result = -1;
             }
         }
-        line++;
+        line ++;
     }
+
     return result;
 }
 
@@ -244,6 +251,7 @@ int assemble(const char* in_name, const char* tmp_name, const char* out_name) {
         if (pass_one(src, dst, symtbl) != 0) {
             err = 1;
         }
+        
         close_files(src, dst);
     }
 
