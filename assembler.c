@@ -82,7 +82,7 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
                 return -1;
             }
         } else {
-            raise_label_error(input_line, str);
+            raise_label_error(input_line + 1, str);
             return -1;
         }
     } else {
@@ -138,15 +138,18 @@ int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
                 i = 0;
                 splitter = strtok(NULL, IGNORE_CHARS);
                 while (splitter != NULL) {
-                    if (i > MAX_ARGS) {
-                        pass = 0;
-                        raise_extra_arg_error(line, splitter);
-                    }
                     args[i] = splitter;
                     i++;
+                    if (i > MAX_ARGS) {
+                        pass = 0;
+                        raise_extra_arg_error(line + 1, splitter);
+                        break;
+                    }
                     splitter = strtok(NULL, IGNORE_CHARS);
+
                 }
                 if (write_pass_one(output, instruction, args, i) == 0 && pass) {
+                    raise_inst_error(line + 1, instruction, args, i);
                     err = -1;
                 }
                 long int temp;
@@ -205,6 +208,7 @@ int pass_two(FILE *input, FILE* output, SymbolTable* symtbl, SymbolTable* reltbl
         line_num++;
 
         if (err == -1) {
+            raise_inst_error(line_num, first_arg, next_args, count_args);
             result = -1;
         }
     }
