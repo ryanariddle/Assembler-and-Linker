@@ -72,7 +72,6 @@ static void skip_comment(char* str) {
  */
 static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
     SymbolTable* symtbl) {
-    
     size_t len = strlen(str);
     if (str[len - 1] == ':') {
         str[len - 1] = '\0';
@@ -120,34 +119,34 @@ static int add_if_label(uint32_t input_line, char* str, uint32_t byte_offset,
    it should return 0.
  */
 int pass_one(FILE* input, FILE* output, SymbolTable* symtbl) {
-    char buf[BUF_SIZE], args[MAX_ARGS];
+    char buf[BUF_SIZE], *args[MAX_ARGS];
     int err, result, line, i;
     char* splitter;
-    char instruction[BUF_SIZE];
+    char instruction[10];
     result = 0, line = 0;
     while (fgets(buf, BUF_SIZE, input)) {
-        skip_comment(buf);
-        splitter = strtok(NULL, IGNORE_CHARS);
-        err = add_if_label(line, splitter, (line + 1)* 4, symtbl);
-        if (err != 0) {
-            splitter = strtok(NULL, IGNORE_CHARS);
-        }
-        printf("hi\n");
-        strcpy(instruction, splitter);
-        i = 0;
-        printf("fuck you\n");
-
-        while (splitter != NULL) {
-            if (i > MAX_ARGS) {
-                raise_extra_arg_error(line, splitter);
+        splitter = strtok(buf, IGNORE_CHARS);
+        if (splitter != NULL) {
+            err = add_if_label(line, splitter, (line + 1)* 4, symtbl);
+            if (err != 0) {
+                splitter = strtok(NULL, IGNORE_CHARS);
             }
+            strcpy(instruction, splitter);
+            i = 0;
             splitter = strtok(NULL, IGNORE_CHARS);
-            args[i] = splitter;
-            i++;
-        }
-        write_pass_one(output, instruction, args, i - 1);
-        if (err == -1) {
-            result = -1;
+            while (splitter != NULL) {
+                if (i > MAX_ARGS) {
+                    raise_extra_arg_error(line, splitter);
+                }
+                
+                args[i] = splitter;
+                i++;
+                splitter = strtok(NULL, IGNORE_CHARS);
+            }
+            write_pass_one(output, instruction, args, i);
+            if (err == -1) {
+                result = -1;
+            }
         }
         line++;
     }
