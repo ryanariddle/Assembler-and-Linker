@@ -100,11 +100,12 @@ int add_to_table(SymbolTable* table, const char* name, uint32_t addr) {
       }
     }
     Symbol *temp = malloc(sizeof(Symbol));
-    temp->name = malloc(sizeof(name) + 1);
+    temp->name = malloc(sizeof(name)*4 + 1);
     strcpy(temp->name, name);
     temp->addr = addr;
     (*table).len += 1;
     t[i] = *temp;
+    free(temp);
     return 0;
   }
 
