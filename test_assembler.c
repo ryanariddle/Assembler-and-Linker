@@ -429,6 +429,7 @@ void test_translate() {
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     CU_ASSERT_EQUAL(strcmp(line, "08000000"), 0);
+    
 
 
     /* Test jal*/
@@ -463,6 +464,7 @@ void test_translate() {
     fclose(file_out);
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
+   
     // printf("%s\n", line);
     // CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
 
@@ -480,7 +482,9 @@ void test_translate() {
     strtok(line, "\n");
     CU_ASSERT_EQUAL(retval, 0);
     // CU_ASSERT_EQUAL(strcmp(line, "???"), 0);
-}
+    free_table(reltbl);
+    free_table(symtbl);
+}	
 
 
 
