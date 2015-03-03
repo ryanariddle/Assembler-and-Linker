@@ -27,7 +27,16 @@ tab:	.asciiz "\t"
 # Returns: the length of the string
 #------------------------------------------------------------------------------
 strlen:
-	# YOUR CODE HERE
+	addiu $v0, $0, 0
+	beq $a0, $0, end1
+	j loop1
+loop1:
+	lb $t0 0($a0)
+	beq $t0, $0, end1
+	addiu $v0, $v0, 1
+	addiu $a0, $a0, 1
+	j loop1
+end1:
 	jr $ra
 
 #------------------------------------------------------------------------------
@@ -41,7 +50,24 @@ strlen:
 # Returns: the destination array
 #------------------------------------------------------------------------------
 strncpy:
-	# YOUR CODE HERE
+	addiu $v0, $a0, 0
+	addi $t3, $0, -1
+	beq $t3,$v0, end3
+	# v0 is empty?
+loop2:
+	beqz $a2, end2
+	lb $t0, 0($a1)
+	beqz $t0, end2
+	sb $t0, 0($a0)
+	addiu $a0, $a0, 1
+	addiu $a1, $a1, 1
+	addiu $a2, $a2, -1
+	j loop2
+end2:
+	la $t1, newline
+	sb $t2 ($a0)
+	jr $ra
+end3:
 	jr $ra
 
 #------------------------------------------------------------------------------
@@ -57,7 +83,17 @@ strncpy:
 # Returns: pointer to the copy of the string
 #------------------------------------------------------------------------------
 copy_of_str:
-	# YOUR CODE HERE
+	# add $t2, $ra, $0
+	# add $t0, $a0, $0  #Store the string address in t0
+	# jal strlen
+	# add $a0, $v0, $0  #Put the length of string in a0
+	# add $t1, $v0, $0
+	# syscall
+	# add $a1, $t0, $0  #Put address of source in a1
+	# add $a2, $t1, $0  #Put length into a2
+	# add $a0, $v0, $0  #Put the new string address into a0
+	# jal strncpy
+	# add $ra, $t0, $0
 	jr $ra
 
 ###############################################################################
