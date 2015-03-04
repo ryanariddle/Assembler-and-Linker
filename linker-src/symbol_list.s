@@ -97,18 +97,31 @@ not_found:
 # Returns: the new list
 #------------------------------------------------------------------------------
 add_to_list:
-# 	beqz $a0 front_is_null
-# 	new_node
-# 	move $t0, $a0
-# 	j append_to_front
+	addiu $sp, $sp, -12
+	sw $s1, 8($sp)
+	sw $s2, 4($sp)
+	sw $ra, 0($sp)
+	move $s0, $a0	#ptr to list
+	move $s1, $a1	#address of symbol
+	move $s2, $a2	#pointer to name of symbol
 
-# front_is_null:
-# 	move $t1, $a0
-# 	new_node
-# 	move $
-# 	move $t1, $
+	jal new_node
+	move $s3, $a0			
+	add $s0, $0, $s1
 
-# append_to_front:
+	addi $s0, $s3, 4
+	# lw $s0, 4($a0)		#string copy
+	move $a0, $s2
+	jal copy_of_str
+	add $s0, $0, $a0
+
+	addi $s0, $s3, 8
+	add $s0, $0, $s3
+	move $a0, $s0
+	lw $a1, 8($sp)
+	lw $a2, 4($sp)
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
 
 
