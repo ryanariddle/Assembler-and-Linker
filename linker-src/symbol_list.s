@@ -207,7 +207,7 @@ print_symbol:
 #  $a1 = name of symbol
 #  $a2 = file pointer
 #
-# Returns: none
+# Returns: none 
 #------------------------------------------------------------------------------
 write_symbol:		
 	addiu $sp, $sp, -20		# Begin write_symbol()
