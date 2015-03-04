@@ -36,8 +36,49 @@
 # Returns: none
 #------------------------------------------------------------------------------
 hex_to_str:
-	# YOUR CODE HERE
+	addiu $sp, $sp, -12
+	sw $ra, 0($sp)
+	sw $s1, 4($sp)
+	sw $s0, 8($sp)
+	addiu $t0, $0, 28
+	addiu $t1, $0, 4
+	j loop
+
+loop:
+	beqz $a0, exit
+	srl $a2, $t0
+	jal convert
+	sll $a0, $a0, $t1
+	srl $a0, $a0, $t1
+	addiu $t0, $t0, -4
+	addiu $t1, $t1, 4
+	addiu $a1, $a1, 1
+	j loop
+
+convert:
+	slti $t3, $a2, 10
+	beq $t3, $0, letter
+	j int
+
+int:
+	addiu $t3, $t3, 48
+	sb $t3, 0($a1)
+	j $ra
+
+letter:
+	addiu $t3, $t3, 87
+	sb $t3, 0($a1)
+	j $ra
+
+
+
+exit:
+	lw $s0, 8($sp)
+	lw $s1, 4($sp)
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
+
 
 ###############################################################################
 #                 DO NOT MODIFY ANYTHING BELOW THIS POINT                       
