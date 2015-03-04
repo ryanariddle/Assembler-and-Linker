@@ -48,15 +48,18 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-	addiu $sp, $sp, -8
+	addiu $sp, $sp, -12
+	sw $a1, 8($sp)
 	sw $s0, 4($sp)
 	sw $ra, 0($sp)
 	move $s0, $a0
+	move $s1, $a1
 	j iter 
 
 iter:
 	beq $s0, $0, not_found
 	lw $a0, 4($s0)
+	lw $a1, 8($sp)
 	jal streq
 	beq $v0, $0, name_found
 	lw $s0, 8($s0)
@@ -64,16 +67,16 @@ iter:
 
 name_found:
 	lw $v0, 0($s0)
-	lw $ra, 0($sp)
 	lw $s0, 4($sp)
-	addiu $sp, $sp, 8
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
 
 not_found:
 	li $v0, -1
-	lw $ra, 0($sp)
 	lw $s0, 4($sp)
-	addiu $sp, $sp, 8
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra 
 #------------------------------------------------------------------------------
 # function add_to_list()
@@ -207,7 +210,7 @@ print_symbol:
 #  $a1 = name of symbol
 #  $a2 = file pointer
 #
-# Returns: none 
+# Returns: none
 #------------------------------------------------------------------------------
 write_symbol:		
 	addiu $sp, $sp, -20		# Begin write_symbol()
