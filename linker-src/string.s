@@ -51,9 +51,8 @@ end1:
 #------------------------------------------------------------------------------
 strncpy:
 	addiu $v0, $a0, 0
-	addi $t3, $0, -1
+	addiu $t3, $0, -1
 	beq $t3,$v0, end3
-	# v0 is empty?
 loop2:
 	beqz $a2, end2
 	lb $t0, 0($a1)
@@ -83,17 +82,24 @@ end3:
 # Returns: pointer to the copy of the string
 #------------------------------------------------------------------------------
 copy_of_str:
-	# add $t2, $ra, $0
-	# add $t0, $a0, $0  #Store the string address in t0
-	# jal strlen
-	# add $a0, $v0, $0  #Put the length of string in a0
-	# add $t1, $v0, $0
-	# syscall
-	# add $a1, $t0, $0  #Put address of source in a1
-	# add $a2, $t1, $0  #Put length into a2
-	# add $a0, $v0, $0  #Put the new string address into a0
-	# jal strncpy
-	# add $ra, $t0, $0
+	addiu $sp, $sp, -12
+	sw $ra, 0($sp)
+	sw $s1, 4($sp)
+	sw $s0, 8($sp)
+	add $s1, $a0, $0
+	jal strlen
+	addi $a0, $v0, 1
+	add $s0, $v0, $0
+	addi $v0, $0, 9
+	syscall
+	add $a1, $s1, $0
+	add $a2, $s0, $0
+	add $a0, $v0, $0
+	jal strncpy
+	lw $s0, 8($sp)
+	lw $s1, 4($sp)
+	lw $ra, 0($sp)
+	addiu $sp, $sp, 12
 	jr $ra
 
 ###############################################################################
