@@ -48,9 +48,33 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-	# YOUR CODE HERE
+	addiu $sp, $sp, -8
+	sw $s0, 4($sp)
+	sw $ra, 0($sp)
+	move $s0, $a0
+	j iter 
+
+iter:
+	beq $s0, $0, not_found
+	lw $a0, 4($s0)
+	jal streq
+	beq $v0, $0, name_found
+	lw $s0, 8($s0)
+	j iter
+
+name_found:
+	lw $v0, 0($s0)
+	lw $ra, 0($sp)
+	lw $s0, 4($sp)
+	addiu $sp, $sp, 8
 	jr $ra
-	
+
+not_found:
+	li $v0, -1
+	lw $ra, 0($sp)
+	lw $s0, 4($sp)
+	addiu $sp, $sp, 8
+	jr $ra 
 #------------------------------------------------------------------------------
 # function add_to_list()
 #------------------------------------------------------------------------------
@@ -69,9 +93,23 @@ addr_for_symbol:
 #
 # Returns: the new list
 #------------------------------------------------------------------------------
-add_to_list:	
-	# YOUR CODE HERE
+add_to_list:
+# 	beqz $a0 front_is_null
+# 	new_node
+# 	move $t0, $a0
+# 	j append_to_front
+
+# front_is_null:
+# 	move $t1, $a0
+# 	new_node
+# 	move $
+# 	move $t1, $
+
+# append_to_front:
 	jr $ra
+
+
+
 
 ###############################################################################
 #                 DO NOT MODIFY ANYTHING BELOW THIS POINT                       
