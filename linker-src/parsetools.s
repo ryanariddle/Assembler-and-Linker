@@ -42,37 +42,43 @@ hex_to_str:
 	sw $s0, 8($sp)
 	addiu $t0, $0, 28
 	addiu $t1, $0, 4
+	addiu $t4, $0, -4
 	j loop
 
 loop:
+	beq $t0, $t4, exit
 	beqz $a0, exit
-	srl $a2, $t0
-	jal convert
-	sll $a0, $a0, $t1
-	srl $a0, $a0, $t1
+	srlv $t3, $a0, $t0
+	j convert
+
+convert:
+	slti $t5, $t3, 10
+	beq $t5, $0, letter
+	j int
+
+int:
+	addiu $t3, $t3, 48
+	sb $t3, ($a1)
+	sllv $a0, $a0, $t1
+	srlv $a0, $a0, $t1
 	addiu $t0, $t0, -4
 	addiu $t1, $t1, 4
 	addiu $a1, $a1, 1
 	j loop
 
-convert:
-	slti $t3, $a2, 10
-	beq $t3, $0, letter
-	j int
-
-int:
-	addiu $t3, $t3, 48
-	sb $t3, 0($a1)
-	j $ra
-
 letter:
 	addiu $t3, $t3, 87
-	sb $t3, 0($a1)
-	j $ra
-
-
+	sb $t3, ($a1)
+	sllv $a0, $a0, $t1
+	srlv $a0, $a0, $t1
+	addiu $t0, $t0, -4
+	addiu $t1, $t1, 4
+	addiu $a1, $a1, 1
+	j loop
 
 exit:
+	addiu $t5, $0, 10
+	sb $t5, ($a1)
 	lw $s0, 8($sp)
 	lw $s1, 4($sp)
 	lw $ra, 0($sp)
