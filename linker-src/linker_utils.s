@@ -77,35 +77,49 @@ zero:
 # Returns: the relocated instruction, or -1 if error
 #------------------------------------------------------------------------------
 relocate_inst:
-	addiu $sp, $sp, -4
+	addiu $sp, $sp, -20
 	sw $ra, 0($sp)
-	add $t0, $0, $a0
-	add $t1, $0, $a1
-	add $t2, $0, $a2
-	add $t3, $0, $a3
-	add $a0, $0, $t3
-	add $a1, $0, $t1
-	jal addr_for_symbol  # Look for byte offset in relocation table
+	sw $s0, 4($sp)
+	sw $s1, 8($sp)
+	sw $s2, 12($sp)
+	sw $s3, 16($sp)
+
+	move $s0, $a0
+	move $s1, $a1
+	move $s2, $a2
+	move $s3, $a3
+	move $a0, $s3
+	move $a1, $s1
+	jal symbol_for_addr  # Look for byte offset in relocation table
 	addiu $t4, $0, -1
 	beq $v0, $t4, error  # Error if it doesn't exist
-	add $a0, $0, $t2
-	add $a1, $0, $v0
+	move $a0, $s2
+	move $a1, $v0
 	jal addr_for_symbol  # Look for label in symbol table
+	addiu $t4, $0, -1
 	beq $v0, $t4, error  # Error if it doesn't exist
 	# If it is in the relocation table
-	srl $t4, $v0, 2      # Shift jump address right by 2
-	srl $v0, $t0, 26	 # Put the opcode in $v0
+	srl $t1, $v0, 2      # Shift jump address right by 2
+	srl $v0, $s0, 26	 # Put the opcode in $v0
 	sll $v0, $v0, 26
-	or $v0, $v0, $t4     # Put the correct instruction in $v0
+	or $v0, $v0, $t1     # Put the correct instruction in $v0
 
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 4
+	lw $s0, 4($sp)
+	lw $s1, 8($sp)
+	lw $s2, 12($sp)
+	lw $s3, 16($sp)
+	addiu $sp, $sp, 20
 	jr $ra
 
 error:
 	addiu $v0, $0, -1
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 4
+	lw $s0, 4($sp)
+	lw $s1, 8($sp)
+	lw $s2, 12($sp)
+	lw $s3, 16($sp)
+	addiu $sp, $sp, 20
 	jr $ra
 
 ###############################################################################

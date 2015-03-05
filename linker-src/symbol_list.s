@@ -48,7 +48,8 @@
 # Returns:  address of symbol if found or -1 if not found
 #------------------------------------------------------------------------------
 addr_for_symbol:
-	addiu $sp, $sp, -12
+	addiu $sp, $sp, -16
+	sw $s1, 12($sp)
 	sw $a1, 8($sp)
 	sw $s0, 4($sp)
 	sw $ra, 0($sp)
@@ -66,17 +67,19 @@ iter:
 	j iter
 
 name_found:
+	lw $s1, 12($sp)
 	lw $v0, 0($s0)
 	lw $s0, 4($sp)
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 12
+	addiu $sp, $sp, 16
 	jr $ra
 
 not_found:
 	li $v0, -1
+	lw $s1, 12($sp)
 	lw $s0, 4($sp)
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 12
+	addiu $sp, $sp, 16
 	jr $ra 
 #------------------------------------------------------------------------------
 # function add_to_list()
@@ -97,8 +100,9 @@ not_found:
 # Returns: the new list
 #------------------------------------------------------------------------------
 add_to_list:
-	addiu $sp, $sp, -16
-	sw $a0, 12($sp)
+	addiu $sp, $sp, -20
+	sw $s5, 16($sp)
+	sw $s4, 12($sp)
 	sw $s0, 8($sp)
 	sw $s1, 4($sp)
 	sw $ra, 0($sp)
@@ -118,11 +122,12 @@ add_to_list:
 
 	move $v0, $s4
 
-	lw $a0, 12($sp)
+	lw $s5, 16($sp)
+	lw $s4, 12($sp)
 	lw $s0, 8($sp)
 	lw $s1, 4($sp)
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 16
+	addiu $sp, $sp, 20
 	jr $ra
 
 
