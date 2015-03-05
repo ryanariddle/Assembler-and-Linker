@@ -97,31 +97,32 @@ not_found:
 # Returns: the new list
 #------------------------------------------------------------------------------
 add_to_list:
-	addiu $sp, $sp, -12
-	sw $s1, 8($sp)
-	sw $s2, 4($sp)
+	addiu $sp, $sp, -16
+	sw $a0, 12($sp)
+	sw $s0, 8($sp)
+	sw $s1, 4($sp)
 	sw $ra, 0($sp)
-	move $s0, $a0	#ptr to list
-	move $s1, $a1	#address of symbol
-	move $s2, $a2	#pointer to name of symbol
+
+	move $s0, $a0
+	move $s1, $a1
 
 	jal new_node
-	move $s3, $a0			
-	add $s0, $0, $s1
+	move $s4, $v0
+	sw $s1, 0($s4)
 
-	addi $s0, $s3, 4
-	# lw $s0, 4($a0)		#string copy
-	move $a0, $s2
+	move $a0, $a2
 	jal copy_of_str
-	add $s0, $0, $a0
+	move $s5, $v0
+	sw $s5, 4($s4)
+	sw $s0, 8($s4)
 
-	addi $s0, $s3, 8
-	add $s0, $0, $s3
-	move $a0, $s0
-	lw $a1, 8($sp)
-	lw $a2, 4($sp)
+	move $v0, $s4
+
+	lw $a0, 12($sp)
+	lw $s0, 8($sp)
+	lw $s1, 4($sp)
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 12
+	addiu $sp, $sp, 16
 	jr $ra
 
 
