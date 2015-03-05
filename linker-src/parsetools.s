@@ -47,7 +47,6 @@ hex_to_str:
 
 loop:
 	beq $t0, $t4, exit
-	beqz $a0, exit
 	srlv $t3, $a0, $t0
 	j convert
 

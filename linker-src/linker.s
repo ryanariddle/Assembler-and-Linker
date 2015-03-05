@@ -48,8 +48,9 @@ hex_buffer:		.space 10
 write_machine_code:
 	# You may need to save additional items onto the stack. Feel free to
 	# change this part.
-	addiu $sp, $sp, -28
-	sw $s4, 24($sp)
+	addiu $sp, $sp, -32
+	sw $s6, 28($sp)
+	sw $s5, 24($sp)
 	sw $s0, 20($sp)
 	sw $s1, 16($sp)
 	sw $s2, 12($sp)
@@ -77,7 +78,7 @@ write_machine_code_find_text:
 	
 	# 1. Initialize the byte offset to zero. We will need this for any instructions
 	# that require relocation:
-	add $s4, $0, $0
+	add $s6, $0, $0
 
 write_machine_code_next_inst:
 	# 2. Call readline() while passing in the correct arguments:
@@ -96,37 +97,39 @@ write_machine_code_next_inst:
 	# 3. Looks like there is another instruction. Call parse_int() with base=16
 	# to convert the instruction into a number, and store it into a register:
 
-	move $a0, $t0
+	move $a0, $v1
 	addiu $a1, $0, 16
 	jal parse_int
-	move $t1, $v0
+	move $s5, $v0
 
 	# 4. Check if the instruction needs relocation. If it does not, branch to
 	# the label write_machine_code_to_file:
 
-	move $a0, $t1
-	inst_needs_relocation
+	move $a0, $s5
+	jal inst_needs_relocation
 	beq $v0, $0, write_machine_code_to_file
 
 	# 5. Here we handle relocation. Call relocate_inst() with the appropriate
 	# arguments, and store the relocated instruction in the appropriate register:
 
-	move $a0, $t1
-	move $a1, $s4
+	move $a0, $s5
+	move $a1, $s6
 	move $a2, $s2
 	move $a3, $s3
-	relocate_inst
+	jal relocate_inst
+	move $s5 $v0
 
 write_machine_code_to_file:
 	# 6. Write the instruction into a string buffer via hex_to_str():
 
-	move $a0, $t1
-	move $a1, $s1
+	move $a0, $s5
+	la $a1, hex_buffer
 	jal hex_to_str
+
 
 	# 7. Increment the byte offset by the appropriate amount:
 
-	addiu $s4, $s4, 4
+	addiu $s6, $s6, 4
 
 	# Here, we use the write to file syscall. WE specify the output file as $a0.
 	move $a0, $s0
@@ -145,14 +148,15 @@ write_machine_code_error:
 	li $v0, -1
 write_machine_code_end:
 	# Don't forget to change this part if you saved more items onto the stack!
-	lw $s4, 24($sp)
+	lw $s6, 28($sp)
+	lw $s5, 24($sp)
 	lw $s0, 20($sp)
 	lw $s1, 16($sp)
 	lw $s2, 12($sp)
 	lw $s3, 8($sp)
 	lw $s4, 4($sp)
 	lw $ra, 0($sp)
-	addiu $sp, $sp, 28
+	addiu $sp, $sp, 32
 	jr $ra
 
 ###############################################################################

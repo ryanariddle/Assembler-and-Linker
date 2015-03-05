@@ -15,6 +15,7 @@
 .data
 hex_str1:	.asciiz "abcdef12\n"
 hex_str2:	.asciiz "00034532\n"
+hex_str3:	.asciiz "08100000\n"
 
 .globl main
 .text
@@ -49,6 +50,12 @@ test_hex_to_str:
 	jal hex_to_str
 	la $a0, test_buffer
 	check_str_equals($a0, hex_str2)
+
+	li $a0, 135266304
+	la $a1, test_buffer
+	jal hex_to_str
+	la $a0, test_buffer
+	check_str_equals($a0, hex_str3)
 	
 	lw $ra, 0($sp)
 	addiu $sp, $sp, 4
