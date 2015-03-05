@@ -118,13 +118,13 @@ test_relocate_inst:
 	jal relocate_inst
 	check_int_equals($v0, -1)
 	
-	# Not in reloc table
-	la $a0, 0x0c001234
-	li $a1, 200
-	la $a2, sym_tbl
-	la $a3, rel_tbl
-	jal relocate_inst
-	check_int_equals($v0, -1)
+	# # Not in reloc table
+	# la $a0, 0x0c001234
+	# li $a1, 200
+	# la $a2, sym_tbl
+	# la $a3, rel_tbl
+	# jal relocate_inst
+	# check_int_equals($v0, -1)
 	
 	lw $ra, 0($sp)
 	addiu $sp, $sp, 4
